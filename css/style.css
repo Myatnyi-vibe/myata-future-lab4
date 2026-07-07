@@ -187,6 +187,13 @@ a { color: inherit; }
   display: none;
   width: clamp(260px, 30vw, 440px);
   aspect-ratio: 1;
+  /* мягкая розово-голубая аура вокруг хрома */
+  filter: drop-shadow(0 22px 44px rgba(226, 154, 214, 0.42))
+          drop-shadow(0 -14px 40px rgba(116, 193, 240, 0.32));
+}
+@media (max-width: 1080px) {
+  /* пофреймовый drop-shadow дорог на мобильных и планшетных GPU */
+  #gyroGl { filter: none; }
 }
 .gyro-wrap.gl-ok #gyroGl { display: block; }
 .gyro-wrap.gl-ok .gyro { display: none; }
@@ -646,6 +653,9 @@ html.modal-open, body.modal-open { overflow: hidden; }
     background: none; -webkit-text-fill-color: var(--ink); color: var(--ink);
   }
   .ticker, .hero-wash, .when-wave, .mem-marquee { display: none; }
+  /* на бумагу — статичная картинка гироскопа вместо канваса */
+  #gyroGl { display: none !important; }
+  .gyro-wrap .gyro { display: block !important; animation: none; filter: none; }
   .topbar { position: static; }
   .gyro, .mm-track { animation: none; }
 }

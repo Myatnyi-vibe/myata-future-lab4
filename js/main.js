@@ -111,9 +111,25 @@
     }
 
     var wLastT = 0;
+    // если поднялась WebGL-вуаль (js/veil.js) — 2D-фолбэк глушим и
+    // освобождаем большой бэкбуфер; при потере GL-контекста воскресаем
+    var veil2dActive = true;
+    window.addEventListener('veil:gl', function () {
+      veil2dActive = false;
+      waveCanvas.width = 0;
+      waveCanvas.height = 0;
+    });
+    window.addEventListener('veil:gl-lost', function () {
+      if (veil2dActive) return;
+      veil2dActive = true;
+      waveCanvas.style.display = '';
+      sizeWave();
+      drawWave(wLastT);
+      if (!reduceMotion) startWaveLoop();
+    });
     // смена width/height очищает канвас — после каждого ресайза рисуем
     // кадр сразу, не дожидаясь rAF
-    function onWaveResize() { sizeWave(); drawWave(wLastT); }
+    function onWaveResize() { if (!veil2dActive) return; sizeWave(); drawWave(wLastT); }
     if ('ResizeObserver' in window) {
       new ResizeObserver(onWaveResize).observe(wSec);
     } else {
@@ -125,16 +141,23 @@
       }, { rootMargin: '120px' }).observe(wSec);
     }
 
-    sizeWave();
-    drawWave(0); // первый кадр синхронно — вуаль видна и до старта rAF-цикла
-    if (!reduceMotion) {
+    var waveLoopRunning = false;
+    function startWaveLoop() {
+      if (waveLoopRunning) return;
+      waveLoopRunning = true;
       (function waveLoop() {
+        // при передаче секции WebGL-вуали цикл полностью останавливается
+        if (!veil2dActive) { waveLoopRunning = false; return; }
         requestAnimationFrame(waveLoop);
         if (!wInView || document.hidden || !wW) return;
         wLastT = performance.now() / 1000;
         drawWave(wLastT);
       })();
     }
+
+    sizeWave();
+    drawWave(0); // первый кадр синхронно — вуаль видна и до старта rAF-цикла
+    if (!reduceMotion) startWaveLoop();
   }
 
   /* ============ ПАУЗА ЛЕНТ (клавиатура/тап) ============ */
