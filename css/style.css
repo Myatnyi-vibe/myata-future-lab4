@@ -88,7 +88,8 @@ a { color: inherit; }
 
 @media (prefers-reduced-motion: reduce) {
   .rv { opacity: 1; transform: none; transition: none !important; }
-  /* канвас вуали сам рисует статичный кадр при reduce (см. js) */
+  .gyro { animation: none; }
+  /* канвасы сами рисуют статичный кадр при reduce (см. js) */
   html { scroll-behavior: auto; }
 }
 
@@ -181,10 +182,31 @@ a { color: inherit; }
 
 .hero-right { display: flex; flex-direction: column; gap: clamp(24px, 2.6vw, 36px); }
 .gyro-wrap { display: flex; justify-content: center; }
-/* статичный рендер из макета — по решению заказчика без анимации */
+/* живая three.js-сцена; статичная картинка — фолбэк при сбое WebGL/CDN */
+#gyroGl {
+  display: none;
+  width: clamp(260px, 30vw, 440px);
+  aspect-ratio: 1;
+  /* мягкая розово-голубая аура вокруг хрома */
+  filter: drop-shadow(0 22px 44px rgba(226, 154, 214, 0.42))
+          drop-shadow(0 -14px 40px rgba(116, 193, 240, 0.32));
+}
+@media (max-width: 1080px) {
+  /* пофреймовый drop-shadow дорог на мобильных и планшетных GPU */
+  #gyroGl { filter: none; }
+}
+.gyro-wrap.gl-ok #gyroGl { display: block; }
+.gyro-wrap.gl-ok .gyro { display: none; }
+body.no-webgl #gyroGl { display: none !important; }
+body.no-webgl .gyro { display: block !important; }
 .gyro {
   width: clamp(240px, 27vw, 400px); height: auto;
+  animation: gyro-float 7s ease-in-out infinite;
   filter: drop-shadow(0 30px 46px rgba(139, 124, 216, 0.28));
+}
+@keyframes gyro-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-16px) rotate(2.4deg); }
 }
 
 .fromto {
@@ -631,7 +653,9 @@ html.modal-open, body.modal-open { overflow: hidden; }
     background: none; -webkit-text-fill-color: var(--ink); color: var(--ink);
   }
   .ticker, .hero-wash, .when-wave, .mem-marquee { display: none; }
-  .gyro { filter: none; }
+  /* на бумагу — статичная картинка гироскопа вместо канваса */
+  #gyroGl { display: none !important; }
+  .gyro-wrap .gyro { display: block !important; animation: none; filter: none; }
   .topbar { position: static; }
-  .mm-track { animation: none; }
+  .gyro, .mm-track { animation: none; }
 }
