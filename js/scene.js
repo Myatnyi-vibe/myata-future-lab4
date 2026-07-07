@@ -76,7 +76,8 @@ function makeEnvTexture() {
   // тёплый персиковый рефлекс
   blob(W * 0.35, H * 0.72, W * 0.2, 'rgba(255,196,181,A)', 0.5);
 
-  // длинные горизонтальные полосы света — фирменные блики хрома
+  // пакет тонких горизонтальных полос света: именно они дают
+  // параллельные световые линии вдоль трубок колец, как на рендере
   const streak = (y, h, color, alpha) => {
     const sg = g.createLinearGradient(0, y - h, 0, y + h);
     sg.addColorStop(0, color.replace('A)', '0)'));
@@ -85,9 +86,13 @@ function makeEnvTexture() {
     g.fillStyle = sg;
     g.fillRect(0, y - h, W, h * 2);
   };
-  streak(H * 0.3, 14, 'rgba(255,255,255,A)', 0.85);
-  streak(H * 0.55, 10, 'rgba(255,182,226,A)', 0.6);
-  streak(H * 0.66, 8, 'rgba(140,196,246,A)', 0.55);
+  streak(H * 0.24, 10, 'rgba(255,255,255,A)', 0.95);
+  streak(H * 0.33, 6, 'rgba(255,224,238,A)', 0.8);
+  streak(H * 0.42, 8, 'rgba(255,170,222,A)', 0.75);
+  streak(H * 0.5, 5, 'rgba(150,206,248,A)', 0.7);
+  streak(H * 0.58, 9, 'rgba(255,255,255,A)', 0.55);
+  streak(H * 0.67, 6, 'rgba(196,168,255,A)', 0.65);
+  streak(H * 0.78, 8, 'rgba(150,120,230,A)', 0.6);
 
   const tex = new THREE.CanvasTexture(c);
   tex.mapping = THREE.EquirectangularReflectionMapping;
@@ -134,19 +139,41 @@ const group = new THREE.Group();
 scene.add(group);
 window.__gyro = group;
 
-/* кольца — приплюснутые «ленты», как на рендере: тор, сплющенный по оси */
-const seg = isMobile ? 140 : 240;
-const tube = isMobile ? 36 : 56;
-const ring1 = new THREE.Mesh(new THREE.TorusGeometry(2.04, 0.42, tube, seg), matRing);
-const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.72, 0.38, tube, seg), matRing);
-ring1.scale.set(1, 1, 0.52);
-ring2.scale.set(1, 1, 0.52);
-const core = new THREE.Mesh(new THREE.SphereGeometry(1.0, isMobile ? 64 : 96, isMobile ? 40 : 64), matCore);
+/* геометрия по рендеру: не идеальные торы, а замкнутые ВОЛОКНА —
+   петли с органической волной по радиусу и высоте (TubeGeometry по
+   замкнутой кривой) вокруг зеркального шара.
+
+   ГАРАНТИЯ НЕПЕРЕСЕЧЕНИЯ при полностью независимом вращении: обе петли
+   концентричны, поэтому достаточно разнести их сферические оболочки.
+   Внешняя: расстояние от центра ≥ minR1 − tube1 = 2.02 − 0.26 = 1.76.
+   Внутренняя: ≤ √(maxR2² + maxZ2²) + tube2 = √(1.47²+0.20²) + 0.22 ≈ 1.70.
+   Шар: r 0.92 < minR2 − tube2 = 1.21 − 0.22 = 0.99. Зазоры держатся
+   при любых углах — «залезть» друг в друга элементы не могут. */
+function makeLoopGeometry(R0, a2, a3, z2, z3, phase, tubeR, tubularSegs, radialSegs) {
+  class LoopCurve extends THREE.Curve {
+    getPoint(t, target = new THREE.Vector3()) {
+      const th = t * Math.PI * 2;
+      const R = R0 + a2 * Math.sin(2 * th + phase) + a3 * Math.sin(3 * th + phase * 1.7);
+      const z = z2 * Math.sin(2 * th + phase * 0.6) + z3 * Math.sin(3 * th + phase * 2.3);
+      return target.set(R * Math.cos(th), R * Math.sin(th), z);
+    }
+  }
+  return new THREE.TubeGeometry(new LoopCurve(), tubularSegs, tubeR, radialSegs, true);
+}
+const ring1 = new THREE.Mesh(
+  makeLoopGeometry(2.2, 0.12, 0.06, 0.22, 0.08, 1.3, 0.26, isMobile ? 180 : 300, isMobile ? 26 : 40),
+  matRing
+);
+const ring2 = new THREE.Mesh(
+  makeLoopGeometry(1.34, 0.08, 0.05, 0.14, 0.06, 4.1, 0.22, isMobile ? 150 : 260, isMobile ? 22 : 36),
+  matRing
+);
+const core = new THREE.Mesh(new THREE.SphereGeometry(0.92, isMobile ? 64 : 96, isMobile ? 40 : 64), matCore);
 group.add(ring1, ring2, core);
 
-/* стартовые наклоны — поза с рендера ПДФ */
-ring1.rotation.set(-0.52, 0.42, 0.3);
-ring2.rotation.set(1.02, -0.5, -0.35);
+/* стартовые наклоны — «X»-поза с рендера ПДФ */
+ring1.rotation.set(-0.62, 0.35, 0.3);
+ring2.rotation.set(1.1, -0.4, -0.35);
 
 let pointerX = 0, pointerY = 0, px = 0, py = 0;
 if (!isMobile) {
@@ -181,16 +208,16 @@ document.addEventListener('visibilitychange', () => { running = !document.hidden
 const clock = new THREE.Clock();
 
 function pose(t) {
-  /* медленная элегантная прецессия: кольца в противоход,
-     ядро дышит бликами */
-  ring1.rotation.x = -0.52 + Math.sin(t * 0.31) * 0.34;
-  ring1.rotation.y = 0.42 + t * 0.44;
-  ring1.rotation.z = 0.3 + Math.sin(t * 0.21) * 0.18;
-  ring2.rotation.x = 1.02 + Math.cos(t * 0.27) * 0.3;
-  ring2.rotation.y = -0.5 - t * 0.37;
-  ring2.rotation.z = -0.35 + Math.cos(t * 0.19) * 0.16;
-  core.rotation.y = t * 0.2;
-  core.rotation.z = Math.sin(t * 0.24) * 0.14;
+  /* каждый элемент живёт своей жизнью: непрерывное вращение вокруг
+     медленно гуляющей оси (вложенные радиусы исключают касания) */
+  ring1.rotation.x = -0.62 + Math.sin(t * 0.29) * 0.45;
+  ring1.rotation.y = 0.35 + t * 0.42;
+  ring1.rotation.z = 0.3 + Math.sin(t * 0.17) * 0.3;
+  ring2.rotation.x = 1.1 + Math.cos(t * 0.24) * 0.5;
+  ring2.rotation.y = -0.4 - t * 0.33;
+  ring2.rotation.z = -0.35 + Math.cos(t * 0.21) * 0.35;
+  core.rotation.y = t * 0.3;
+  core.rotation.x = Math.sin(t * 0.2) * 0.25;
   group.position.y = reduceMotion ? 0 : Math.sin(t * 0.6) * 0.12;
   group.rotation.z = Math.sin(t * 0.16) * 0.05;
   group.rotation.y = px * 0.3;
