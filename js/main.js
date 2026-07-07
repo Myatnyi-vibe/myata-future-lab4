@@ -61,12 +61,21 @@
     cells.forEach(function (c) {
       var event = !c.dim && c.n === 27;
       var cls = 'cal-cell' + (c.dim ? ' dim' : '') + (event ? ' event' : '');
-      html += '<span class="' + cls + '"' +
-        (event ? ' data-day="27" aria-label="27 августа — день слёта"' : '') +
-        '>' + c.n + '</span>';
+      html += '<span class="' + cls + '"' + (event ? ' data-day="27"' : '') + '>' + c.n + '</span>';
     });
     calGrid.innerHTML = html;
   }
+
+  /* ============ ПАУЗА ЛЕНТ (клавиатура/тап) ============ */
+  ['.ticker', '.mem-marquee'].forEach(function (sel) {
+    var el = document.querySelector(sel);
+    if (!el) return;
+    function toggle() { el.classList.toggle('is-paused'); }
+    el.addEventListener('click', toggle);
+    el.addEventListener('keydown', function (e) {
+      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); }
+    });
+  });
 
   /* ============ МОДАЛЬНАЯ ФОРМА ============ */
   var modal = document.getElementById('modal');
@@ -81,16 +90,21 @@
   function openModal() {
     lastFocused = document.activeElement;
     modal.hidden = false;
+    /* класс и на html: overflow с body не пробрасывается на viewport
+       из-за overflow-x: clip на html */
+    document.documentElement.classList.add('modal-open');
     document.body.classList.add('modal-open');
     form.hidden = false;
     success.hidden = true;
     setStatus('');
+    ['name', 'location', 'phone'].forEach(function (n) { setInvalid(n, false); });
     var first = document.getElementById('fName');
     setTimeout(function () { if (first) first.focus(); }, 80);
   }
   function closeModal() {
     if (isSubmitting) return;
     modal.hidden = true;
+    document.documentElement.classList.remove('modal-open');
     document.body.classList.remove('modal-open');
     if (lastFocused && lastFocused.focus) lastFocused.focus();
   }
@@ -110,7 +124,9 @@
     if (e.key !== 'Tab') return;
     var focusables = modal.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])');
     var list = Array.prototype.filter.call(focusables, function (el) {
-      return el.offsetParent !== null;
+      /* disabled-кнопка и honeypot (tabindex=-1) не участвуют в Tab-обходе —
+         не должны попадать и в края ловушки */
+      return el.offsetParent !== null && !el.disabled && el.getAttribute('tabindex') !== '-1';
     });
     if (!list.length) return;
     var first = list[0], last = list[list.length - 1];
@@ -188,18 +204,31 @@
 
     var body = JSON.stringify(payload);
 
+    /* таймаут: на зависшей мобильной сети запрос не должен держать
+       пользователя в заблокированной модалке десятки секунд */
+    var ctrl = new AbortController();
+    var timer = setTimeout(function () { ctrl.abort(); }, 12000);
+
     fetch(WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: body
+      body: body,
+      signal: ctrl.signal
     }).then(function (res) {
+      clearTimeout(timer);
       // ответ получен: дальнейшие ошибки окончательные, без no-cors повтора
       if (!res.ok) {
         var httpErr = new Error('HTTP ' + res.status);
         httpErr.confirmed = true;
         throw httpErr;
       }
-      return res.json().catch(function () { return { ok: true }; });
+      // наш doPost всегда отвечает JSON — HTML-тело при 200 значит,
+      // что запрос попал не в скрипт (страница ошибки Google)
+      return res.json().catch(function () {
+        var parseErr = new Error('non-JSON response');
+        parseErr.confirmed = true;
+        throw parseErr;
+      });
     }).then(function (data) {
       if (data && data.ok === false) {
         setStatus('Не удалось отправить заявку. Попробуйте ещё раз', true);
@@ -207,14 +236,21 @@
       }
       showSuccess();
     }).catch(function (err) {
+      clearTimeout(timer);
       if (err && err.confirmed) {
         setStatus('Не удалось отправить заявку. Попробуйте ещё раз', true);
         return;
       }
-      // сетевой/CORS-сбой без HTTP-ответа: непрозрачный повтор
-      return fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', body: body })
-        .then(function () { showSuccess(); })
+      /* сетевой/CORS-сбой без HTTP-ответа: непрозрачный повтор.
+         ОСОЗНАННЫЙ РИСК: opaque-ответ не различает успех и ошибку сервера —
+         при мёртвом деплое вебхука посетитель увидит ложный успех.
+         Компенсация — периодическая сверка заявок в таблице. */
+      var ctrl2 = new AbortController();
+      var timer2 = setTimeout(function () { ctrl2.abort(); }, 9000);
+      return fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', body: body, signal: ctrl2.signal })
+        .then(function () { clearTimeout(timer2); showSuccess(); })
         .catch(function () {
+          clearTimeout(timer2);
           setStatus('Не удалось отправить. Проверьте связь и попробуйте ещё раз', true);
         });
     }).finally(function () {

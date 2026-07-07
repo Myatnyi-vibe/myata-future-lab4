@@ -68,7 +68,7 @@
   </section>
 
   <!-- ============ БЕГУЩАЯ СТРОКА ============ -->
-  <div class="ticker" aria-label="Программа вечера: официальная часть, нетворкинг, награждение, вечеринка будущего, cocktail future">
+  <div class="ticker" tabindex="0" role="group" aria-label="Программа вечера: официальная часть, нетворкинг, награждение, вечеринка будущего, cocktail future. Пробел — пауза бегущей строки">
     <div class="ticker-track" aria-hidden="true">
       <div class="ticker-seq">
         <span>ОФИЦИАЛЬНАЯ&nbsp;ЧАСТЬ</span><i></i>
@@ -100,7 +100,7 @@
           <h2 class="sec-title rv" data-d="1">Совсем скоро.</h2>
           <p class="sec-text rv" data-d="2">Один вечер, к&nbsp;которому мы готовимся весь год. Отметьте дату&nbsp;— переносов не&nbsp;будет ни&nbsp;вчера, ни&nbsp;завтра, ни&nbsp;в&nbsp;будущем.</p>
         </div>
-        <div class="calendar rv" data-d="2" aria-label="Календарь: август 2026, слёт 27 августа, четверг">
+        <div class="calendar rv" data-d="2" role="img" aria-label="Календарь: август 2026, слёт 27 августа, четверг">
           <div class="cal-head">
             <b>АВГУСТ</b>
             <span>2026&nbsp;·&nbsp;ЧТ</span>
@@ -124,7 +124,7 @@
       <div class="where-grid">
         <div class="where-left">
           <h2 class="holo-title rv" data-d="1">CONNECT</h2>
-          <p class="sub-caps rv" data-d="2">МУЛЬТИМЕДИЙНОЕ&nbsp;ПРОСТРАНСТВО</p>
+          <p class="sub-caps rv" data-d="2">МУЛЬТИМЕДИЙНОЕ ПРОСТРАНСТВО</p>
           <p class="addr rv" data-d="2"><a href="https://yandex.ru/maps/?text=Москва, 5-й Донской проезд, 17" target="_blank" rel="noopener">Москва, 5-й&nbsp;Донской проезд,&nbsp;17</a></p>
           <figure class="ph ph-lobby rv" data-d="3">
             <img src="assets/venue-lobby.jpg" width="1280" height="853" alt="Входная зона пространства Connect" loading="lazy">
@@ -151,17 +151,11 @@
           <h2 class="holo-title rv" data-d="1">COCKTAIL<br>FUTURE</h2>
           <p class="sec-text rv" data-d="2">На&nbsp;нашем празднике действует дресс-код: <b>cocktail future</b>&nbsp;— классический коктейльный стиль, который не&nbsp;нуждается в&nbsp;обновлениях ни&nbsp;вчера, ни&nbsp;сегодня и…&nbsp;даже в&nbsp;будущем.</p>
           <p class="sec-text rv" data-d="3">Но&nbsp;это не&nbsp;все: в&nbsp;элегантную коктейльную базу мы добавляем футуристичные акценты и&nbsp;неоновые детали. Будьте элегантными и&nbsp;стильными&nbsp;— а&nbsp;если добавите элементы футуристичного вайба, считайте, что внесли личный вклад в&nbsp;атмосферу вечера из&nbsp;будущего!</p>
-          <dl class="palette rv" data-d="4" aria-label="Палитра дресс-кода: холодная">
-            <div class="pal-cell">
-              <dt><i class="sw sw-silver" aria-hidden="true"></i>СЕРЕБРО</dt>
-            </div>
-            <div class="pal-cell">
-              <dt><i class="sw sw-white" aria-hidden="true"></i>БЕЛЫЙ</dt>
-            </div>
-            <div class="pal-cell">
-              <dt><i class="sw sw-black" aria-hidden="true"></i>ЧЁРНЫЙ</dt>
-            </div>
-          </dl>
+          <ul class="palette rv" data-d="4" aria-label="Палитра дресс-кода" role="list">
+            <li class="pal-cell"><i class="sw sw-silver" aria-hidden="true"></i>СЕРЕБРО</li>
+            <li class="pal-cell"><i class="sw sw-white" aria-hidden="true"></i>БЕЛЫЙ</li>
+            <li class="pal-cell"><i class="sw sw-black" aria-hidden="true"></i>ЧЁРНЫЙ</li>
+          </ul>
         </div>
         <div class="dress-collage">
           <figure class="ph df rv" data-d="1"><img src="assets/dress-1.jpg" width="675" height="1200" alt="Референс дресс-кода: белая майка, серебристые перчатки и металлик-брюки" loading="lazy"></figure>
@@ -182,18 +176,19 @@
         <span class="sm-label">ПРОГРАММА</span>
         <span class="sm-num">04&nbsp;/&nbsp;05</span>
       </div>
-      <ol class="prog">
+      <h2 class="visually-hidden">Программа</h2>
+      <ol class="prog" role="list">
         <li class="prog-row rv">
           <span class="pr-num">01</span>
           <h3 class="pr-name"><span>МЯТА</span><b class="holo-word">WELCOME</b></h3>
-          <ul class="pr-points">
+          <ul class="pr-points" role="list">
             <li>Регистрация в новой реальности: сбор гостей, знакомство и&nbsp;нетворкинг</li>
           </ul>
         </li>
         <li class="prog-row rv" data-d="1">
           <span class="pr-num">02</span>
           <h3 class="pr-name"><span>МЯТА</span><b class="holo-word">BUSINESS</b></h3>
-          <ul class="pr-points">
+          <ul class="pr-points" role="list">
             <li>Выступление Управляющей компании: итоги и&nbsp;планы работы</li>
             <li>Выступление приглашенных спикеров</li>
           </ul>
@@ -201,7 +196,7 @@
         <li class="prog-row rv" data-d="2">
           <span class="pr-num">03</span>
           <h3 class="pr-name"><span>МЯТА</span><b class="holo-word">AWARDS</b></h3>
-          <ul class="pr-points">
+          <ul class="pr-points" role="list">
             <li>Награждение лучших партнеров сети</li>
             <li>Вручение ценных подарков</li>
           </ul>
@@ -209,7 +204,7 @@
         <li class="prog-row rv" data-d="3">
           <span class="pr-num">04</span>
           <h3 class="pr-name"><span>МЯТА</span><b class="holo-word">PARTY</b></h3>
-          <ul class="pr-points">
+          <ul class="pr-points" role="list">
             <li>Грандиозная вечерняя программа</li>
             <li>Выступление знаменитого артиста и&nbsp;кавер-группы</li>
             <li>Множество невероятных сюрпризов</li>
@@ -231,28 +226,28 @@
         <p class="sec-text rv" data-d="2">Вспомним нашу встречу, чтобы настроиться на&nbsp;нужное настроение!</p>
       </div>
     </div>
-    <div class="mem-marquee rv" data-d="2" aria-label="Фотографии со слёта партнёров 2025 года">
+    <div class="mem-marquee rv" data-d="2" tabindex="0" role="group" aria-label="Фотографии со слёта партнёров 2025 года. Пробел — пауза ленты">
       <div class="mm-track">
-        <figure><img src="assets/mem-1.jpg" width="1280" height="854" alt="Слёт 2025: танцевальное шоу на сцене в зелёных лучах" loading="lazy"></figure>
-        <figure><img src="assets/mem-2.jpg" width="1280" height="854" alt="Слёт 2025: выступление спикера на сцене" loading="lazy"></figure>
-        <figure><img src="assets/mem-3.jpg" width="1280" height="854" alt="Слёт 2025: генеральный директор сети на сцене" loading="lazy"></figure>
-        <figure><img src="assets/mem-4.jpg" width="1280" height="854" alt="Слёт 2025: награждение сборной Красноярска" loading="lazy"></figure>
-        <figure><img src="assets/mem-5.jpg" width="1280" height="854" alt="Слёт 2025: выступление артистов в неоновом свете" loading="lazy"></figure>
-        <figure><img src="assets/mem-6.jpg" width="1280" height="854" alt="Слёт 2025: фуршет и нетворкинг в фойе" loading="lazy"></figure>
-        <figure><img src="assets/mem-7.jpg" width="1280" height="854" alt="Слёт 2025: банкетный зал в зелёных лучах" loading="lazy"></figure>
-        <figure><img src="assets/mem-8.jpg" width="1280" height="854" alt="Слёт 2025: панорама зала и сцены" loading="lazy"></figure>
-        <figure><img src="assets/mem-9.jpg" width="1280" height="854" alt="Слёт 2025: гости общаются в фойе" loading="lazy"></figure>
-        <figure><img src="assets/mem-10.jpg" width="1280" height="854" alt="Слёт 2025: вручение премии «Выбор гостя»" loading="lazy"></figure>
-        <figure aria-hidden="true"><img src="assets/mem-1.jpg" width="1280" height="854" alt="" loading="lazy"></figure>
-        <figure aria-hidden="true"><img src="assets/mem-2.jpg" width="1280" height="854" alt="" loading="lazy"></figure>
-        <figure aria-hidden="true"><img src="assets/mem-3.jpg" width="1280" height="854" alt="" loading="lazy"></figure>
-        <figure aria-hidden="true"><img src="assets/mem-4.jpg" width="1280" height="854" alt="" loading="lazy"></figure>
-        <figure aria-hidden="true"><img src="assets/mem-5.jpg" width="1280" height="854" alt="" loading="lazy"></figure>
-        <figure aria-hidden="true"><img src="assets/mem-6.jpg" width="1280" height="854" alt="" loading="lazy"></figure>
-        <figure aria-hidden="true"><img src="assets/mem-7.jpg" width="1280" height="854" alt="" loading="lazy"></figure>
-        <figure aria-hidden="true"><img src="assets/mem-8.jpg" width="1280" height="854" alt="" loading="lazy"></figure>
-        <figure aria-hidden="true"><img src="assets/mem-9.jpg" width="1280" height="854" alt="" loading="lazy"></figure>
-        <figure aria-hidden="true"><img src="assets/mem-10.jpg" width="1280" height="854" alt="" loading="lazy"></figure>
+        <figure><img src="assets/mem-1.jpg" width="800" height="534" alt="Слёт 2025: танцевальное шоу на сцене в зелёных лучах" loading="lazy"></figure>
+        <figure><img src="assets/mem-2.jpg" width="800" height="534" alt="Слёт 2025: выступление спикера на сцене" loading="lazy"></figure>
+        <figure><img src="assets/mem-3.jpg" width="800" height="534" alt="Слёт 2025: генеральный директор сети на сцене" loading="lazy"></figure>
+        <figure><img src="assets/mem-4.jpg" width="800" height="534" alt="Слёт 2025: награждение сборной Красноярска" loading="lazy"></figure>
+        <figure><img src="assets/mem-5.jpg" width="800" height="534" alt="Слёт 2025: выступление артистов в неоновом свете" loading="lazy"></figure>
+        <figure><img src="assets/mem-6.jpg" width="800" height="534" alt="Слёт 2025: фуршет и нетворкинг в фойе" loading="lazy"></figure>
+        <figure><img src="assets/mem-7.jpg" width="800" height="534" alt="Слёт 2025: банкетный зал в зелёных лучах" loading="lazy"></figure>
+        <figure><img src="assets/mem-8.jpg" width="800" height="534" alt="Слёт 2025: панорама зала и сцены" loading="lazy"></figure>
+        <figure><img src="assets/mem-9.jpg" width="800" height="534" alt="Слёт 2025: гости общаются в фойе" loading="lazy"></figure>
+        <figure><img src="assets/mem-10.jpg" width="800" height="534" alt="Слёт 2025: вручение премии «Выбор гостя»" loading="lazy"></figure>
+        <figure aria-hidden="true"><img src="assets/mem-1.jpg" width="800" height="534" alt="" loading="lazy"></figure>
+        <figure aria-hidden="true"><img src="assets/mem-2.jpg" width="800" height="534" alt="" loading="lazy"></figure>
+        <figure aria-hidden="true"><img src="assets/mem-3.jpg" width="800" height="534" alt="" loading="lazy"></figure>
+        <figure aria-hidden="true"><img src="assets/mem-4.jpg" width="800" height="534" alt="" loading="lazy"></figure>
+        <figure aria-hidden="true"><img src="assets/mem-5.jpg" width="800" height="534" alt="" loading="lazy"></figure>
+        <figure aria-hidden="true"><img src="assets/mem-6.jpg" width="800" height="534" alt="" loading="lazy"></figure>
+        <figure aria-hidden="true"><img src="assets/mem-7.jpg" width="800" height="534" alt="" loading="lazy"></figure>
+        <figure aria-hidden="true"><img src="assets/mem-8.jpg" width="800" height="534" alt="" loading="lazy"></figure>
+        <figure aria-hidden="true"><img src="assets/mem-9.jpg" width="800" height="534" alt="" loading="lazy"></figure>
+        <figure aria-hidden="true"><img src="assets/mem-10.jpg" width="800" height="534" alt="" loading="lazy"></figure>
       </div>
     </div>
   </section>
