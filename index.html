@@ -49,6 +49,7 @@
         </div>
         <div class="hero-right">
           <div class="gyro-wrap rv" data-d="2">
+            <canvas id="gyroGl" aria-hidden="true"></canvas>
             <img class="gyro" src="assets/gyro.webp" alt="" width="871" height="890" fetchpriority="high">
           </div>
           <dl class="fromto rv" data-d="3">
@@ -89,7 +90,7 @@
 
   <!-- ============ 01 КОГДА ============ -->
   <section class="sec when" id="when">
-    <img class="when-wave" src="assets/wave.webp" alt="" loading="lazy" aria-hidden="true">
+    <canvas class="when-wave" id="waveCanvas" aria-hidden="true"></canvas>
     <div class="container">
       <div class="sec-meta rv">
         <span class="sm-label">КОГДА</span>
@@ -331,5 +332,13 @@
 </div>
 
 <script src="js/main.js" defer></script>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+<script type="module" src="js/scene.js" onerror="document.body.classList.add('no-webgl')"></script>
 </body>
 </html>

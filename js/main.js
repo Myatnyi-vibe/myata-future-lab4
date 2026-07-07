@@ -66,6 +66,77 @@
     calGrid.innerHTML = html;
   }
 
+  /* ============ ВУАЛЬ ИЗ ТОЧЕК В «КОГДА» ============ */
+  // процедурная волна на всю плоскость секции: слои точечных линий,
+  // плывущих по трём наложенным синусоидам
+  var waveCanvas = document.getElementById('waveCanvas');
+  if (waveCanvas && waveCanvas.getContext) {
+    var wctx = waveCanvas.getContext('2d');
+    var wSec = waveCanvas.parentElement;
+    var wW = 0, wH = 0;
+    var wDpr = Math.min(window.devicePixelRatio || 1, 2);
+    var wInView = true;
+
+    function sizeWave() {
+      var w = wSec.clientWidth, h = wSec.clientHeight;
+      if (!w || !h) return;
+      wW = w; wH = h;
+      waveCanvas.width = Math.round(w * wDpr);
+      waveCanvas.height = Math.round(h * wDpr);
+      wctx.setTransform(wDpr, 0, 0, wDpr, 0, 0);
+    }
+
+    function drawWave(t) {
+      wctx.clearRect(0, 0, wW, wH);
+      var lines = 26;
+      var stepX = wW > 900 ? 16 : 20;
+      for (var l = 0; l < lines; l++) {
+        var f = l / (lines - 1);
+        var base = wH * (0.06 + 0.88 * f);
+        // чередуем серебро и перванш, как в макете
+        var silver = l % 2 === 0;
+        for (var x = 0; x <= wW; x += stepX) {
+          var y = base
+            + Math.sin(x * 0.0036 + l * 0.34 + t * 0.5) * 42
+            + Math.sin(x * 0.0015 - l * 0.16 + t * 0.22) * (wH * 0.075)
+            + Math.cos(x * 0.007 + l * 0.06 - t * 0.34) * 13;
+          var a = 0.13 + 0.13 * Math.sin(x * 0.0021 + l * 0.72 + t * 0.4);
+          if (a <= 0.02) continue;
+          wctx.fillStyle = (silver ? 'rgba(148,158,178,' : 'rgba(122,132,196,') + a.toFixed(3) + ')';
+          wctx.beginPath();
+          wctx.arc(x, y, 1.4, 0, 6.2832);
+          wctx.fill();
+        }
+      }
+    }
+
+    var wLastT = 0;
+    // смена width/height очищает канвас — после каждого ресайза рисуем
+    // кадр сразу, не дожидаясь rAF
+    function onWaveResize() { sizeWave(); drawWave(wLastT); }
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(onWaveResize).observe(wSec);
+    } else {
+      window.addEventListener('resize', onWaveResize);
+    }
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        wInView = entries[0].isIntersecting;
+      }, { rootMargin: '120px' }).observe(wSec);
+    }
+
+    sizeWave();
+    drawWave(0); // первый кадр синхронно — вуаль видна и до старта rAF-цикла
+    if (!reduceMotion) {
+      (function waveLoop() {
+        requestAnimationFrame(waveLoop);
+        if (!wInView || document.hidden || !wW) return;
+        wLastT = performance.now() / 1000;
+        drawWave(wLastT);
+      })();
+    }
+  }
+
   /* ============ ПАУЗА ЛЕНТ (клавиатура/тап) ============ */
   ['.ticker', '.mem-marquee'].forEach(function (sel) {
     var el = document.querySelector(sel);
